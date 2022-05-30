@@ -6,7 +6,11 @@ package it.polito.tdp.itunes;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.itunes.model.Adiacenza;
+import it.polito.tdp.itunes.model.Genre;
 import it.polito.tdp.itunes.model.Model;
+import it.polito.tdp.itunes.model.Track;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -34,10 +38,10 @@ public class FXMLController {
     private Button btnMassimo; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbCanzone"
-    private ComboBox<?> cmbCanzone; // Value injected by FXMLLoader
+    private ComboBox<Track> cmbCanzone; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbGenere"
-    private ComboBox<?> cmbGenere; // Value injected by FXMLLoader
+    private ComboBox<Genre> cmbGenere; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtMemoria"
     private TextField txtMemoria; // Value injected by FXMLLoader
@@ -47,17 +51,64 @@ public class FXMLController {
 
     @FXML
     void btnCreaLista(ActionEvent event) {
-
+    	txtResult.clear();
+    	Track c = this.cmbCanzone.getValue();
+    	if(c == null) {
+    		txtResult.appendText("Seleziona una canzone!");
+    		return ;
+    	}
+    	int m;
+    	try {
+    		m = Integer.parseInt(txtMemoria.getText());
+    	}catch (NumberFormatException e) {
+    		txtResult.appendText("Inseririci un valore numerico per la memoria");
+    		return ;
+    	}
+    	
+    	if(!this.model.grafoCreato()) {
+    		txtResult.appendText("Crea prima il grafo!");
+    		return ;
+    	}
+    	
+    	txtResult.appendText("LISTA CANZONI MIGLIORE: \n");
+    	for(Track t : this.model.cercaLista(c, m)) {
+    		txtResult.appendText(t + "\n");
+    	}
+    	
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	txtResult.clear();
+    	Genre g = this.cmbGenere.getValue();
+    	if(g == null) {
+    		txtResult.appendText("Seleziona un genere!");
+    		return ;
+    	}
+    	
+    	this.model.creaGrafo(g);
+    	
+    	txtResult.appendText("Grafo creato!\n");
+    	txtResult.appendText("# Vertici : " + this.model.nVertici() + "\n");
+    	txtResult.appendText("# Archi : " + this.model.nArchi() + "\n");
 
+    	this.cmbCanzone.getItems().clear();
+    	this.cmbCanzone.getItems().addAll(this.model.getVertici());
+ 
     }
 
     @FXML
     void doDeltaMassimo(ActionEvent event) {
+    	txtResult.clear();
     	
+    	if(!this.model.grafoCreato()) {
+    		txtResult.appendText("Crea prima il grafo!");
+    		return ;
+    	}
+    	
+    	for(Adiacenza a : this.model.getDeltaMassimo()) {
+    		txtResult.appendText(a.toString() + "\n");
+    	}
     	
     }
 
@@ -70,11 +121,12 @@ public class FXMLController {
         assert cmbGenere != null : "fx:id=\"cmbGenere\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtMemoria != null : "fx:id=\"txtMemoria\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Scene.fxml'.";
-
+        
     }
     
     public void setModel(Model model) {
     	this.model = model;
+    	this.cmbGenere.getItems().addAll(this.model.getGeneri());
     }
 
 }
