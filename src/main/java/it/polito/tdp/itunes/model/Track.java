@@ -7,11 +7,13 @@ public class Track {
 	private int milliseconds;
 	private int bytes;
 	private double unitPrice;
+	private int mediaTypeId;
 	
-	public Track(Integer trackId, String name, String composer, int milliseconds, int bytes, double unitPrice) {
+	public Track(Integer trackId, String name, int mediaTypeId, String composer, int milliseconds, int bytes, double unitPrice) {
 		super();
 		this.trackId = trackId;
 		this.name = name;
+		this.mediaTypeId = mediaTypeId;
 		this.composer = composer;
 		this.milliseconds = milliseconds;
 		this.bytes = bytes;
@@ -29,6 +31,12 @@ public class Track {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public int getMediaTypeId() {
+		return mediaTypeId;
+	}
+	public void setMediaTypeId(int mediaTypeId) {
+		this.mediaTypeId = mediaTypeId;
 	}
 	public String getComposer() {
 		return composer;

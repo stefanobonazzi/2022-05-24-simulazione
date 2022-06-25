@@ -76,17 +76,19 @@ public class ItunesDAO {
 		return result;
 	}
 	
-	public List<Track> getAllTracks(){
-		final String sql = "SELECT * FROM Track";
+	public List<Track> getAllTracks(Genre g) {
+		final String sql = "SELECT * FROM Track "
+				+ "WHERE GenreId = ?";
 		List<Track> result = new ArrayList<Track>();
 		
 		try {
 			Connection conn = DBConnect.getConnection();
 			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, g.getGenreId());
 			ResultSet res = st.executeQuery();
 
 			while (res.next()) {
-				result.add(new Track(res.getInt("TrackId"), res.getString("Name"), 
+				result.add(new Track(res.getInt("TrackId"), res.getString("Name"), res.getInt("MediaTypeId"), 
 						res.getString("Composer"), res.getInt("Milliseconds"), 
 						res.getInt("Bytes"),res.getDouble("UnitPrice")));
 			

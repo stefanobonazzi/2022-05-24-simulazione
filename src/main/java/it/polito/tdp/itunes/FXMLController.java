@@ -5,8 +5,11 @@
 package it.polito.tdp.itunes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import it.polito.tdp.itunes.model.Genre;
 import it.polito.tdp.itunes.model.Model;
+import it.polito.tdp.itunes.model.Track;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -34,10 +37,10 @@ public class FXMLController {
     private Button btnMassimo; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbCanzone"
-    private ComboBox<?> cmbCanzone; // Value injected by FXMLLoader
+    private ComboBox<Track> cmbCanzone; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbGenere"
-    private ComboBox<?> cmbGenere; // Value injected by FXMLLoader
+    private ComboBox<Genre> cmbGenere; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtMemoria"
     private TextField txtMemoria; // Value injected by FXMLLoader
@@ -47,18 +50,60 @@ public class FXMLController {
 
     @FXML
     void btnCreaLista(ActionEvent event) {
-
+    	if(!this.model.grafoCreato()) {
+    		this.doCreaGrafo(event);
+    		
+    		if(this.txtResult.getText().contains("Grafo creato!")) {
+    			this.btnCreaLista(event);
+        		return;
+        	}
+    		
+    		return;
+    	}
+    	
+    	Track c = cmbCanzone.getValue();
+    	if(c == null) {
+    		this.txtResult.setText("Seleziona una canzone!");
+    		return;
+    	}
+    	
+    	int m;
+    	try {
+			m = Integer.parseInt(txtMemoria.getText());
+		} catch (NumberFormatException e) {
+			txtResult.setText("Inserisci un numero intero per la memoria!");
+			return;
+		}
+    	
+    	String s = this.model.creaLista(c, m);
+    	this.txtResult.setText(s);
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	Genre g = cmbGenere.getValue();
+    	if(g == null) {
+    		this.txtResult.setText("Seleziona un genere!");
+    		return;
+    	}
+    	
+    	String s = this.model.creaGrafo(g);
+    	this.txtResult.setText(s);
+    	
+    	this.cmbCanzone.getItems().clear();
+    	this.cmbCanzone.getItems().addAll(this.model.getVertices());
     }
 
     @FXML
     void doDeltaMassimo(ActionEvent event) {
+    	if(!this.model.grafoCreato()) 
+    		this.doCreaGrafo(event);
     	
     	
+    	if(this.txtResult.getText().contains("Grafo creato!")) {
+    		String s = this.model.deltaMassimo();
+    		this.txtResult.setText(s);
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -75,6 +120,10 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	List<Genre> genres = this.model.getAllGenres();
+    	
+    	this.cmbGenere.getItems().clear();
+    	this.cmbGenere.getItems().addAll(genres);
     }
 
 }
